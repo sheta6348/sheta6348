@@ -1,0 +1,15 @@
+{
+  "name": "freightcom-ship",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Opens Freightcom, logs in, and fills the Shipping From side of a new shipment.",
+  "scripts": {
+    "setup": "playwright install chromium",
+    "ship": "node freightcom-ship.mjs",
+    "ship:fresh": "node freightcom-ship.mjs --fresh"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

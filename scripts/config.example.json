@@ -1,0 +1,37 @@
+{
+  "_comment": "Copy this to config.local.json and fill it in. config.local.json is gitignored and never leaves your computer.",
+
+  "loginUrl": "https://live.freightcom.com/login",
+
+  "credentials": {
+    "_comment": "Leave email/password empty to log in by hand the first time. The script remembers the session afterwards, so you only do it once. This also handles two-factor login.",
+    "email": "",
+    "password": ""
+  },
+
+  "shipFrom": {
+    "company": "JD Chheta",
+    "address1": "123 Example Street",
+    "address2": "",
+    "unit": "",
+    "postalCode": "A1A 1A1",
+    "city": "Your City",
+    "province": "Ontario",
+    "country": "Canada",
+    "residential": false,
+    "contactName": "Your Name",
+    "phone": "5555555555",
+    "extension": "",
+    "email": "you@example.com"
+  },
+
+  "packaging": {
+    "type": "Package",
+    "lengthIn": 4,
+    "widthIn": 4,
+    "heightIn": 4,
+    "weightLb": 0.55,
+    "declaredValue": 5,
+    "description": "Glass figurine"
+  }
+}
