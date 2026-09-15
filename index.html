@@ -1,0 +1,460 @@
+<title>Freightcom Label Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#f7f4ee; --card:#ffffff; --ink:#1b2230; --ink-soft:#5c6579; --line:#ded7ca;
+  --kraft:#b5762f; --kraft-soft:#f1e3d0; --fragile:#b8342b; --ok:#2f6f4f;
+  --field:#fffdf9; --shadow:0 1px 2px rgba(27,34,48,.07),0 8px 20px rgba(27,34,48,.05);
+  --label-ground:#ffffff; --label-ink:#000000;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#15181f; --card:#1d212a; --ink:#eae6dd; --ink-soft:#9aa1b1; --line:#333a47;
+    --kraft:#d79a52; --kraft-soft:#3a2f22; --fragile:#e0655b; --ok:#6cc194;
+    --field:#171b23; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15181f; --card:#1d212a; --ink:#eae6dd; --ink-soft:#9aa1b1; --line:#333a47;
+  --kraft:#d79a52; --kraft-soft:#3a2f22; --fragile:#e0655b; --ok:#6cc194;
+  --field:#171b23; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 15px/1.5 "Source Sans 3",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:Archivo,system-ui,sans-serif;text-wrap:balance;margin:0}
+.wrap{max-width:1140px;margin:0 auto;padding:0 16px 64px}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;padding-block:28px 20px;border-bottom:1px solid var(--line)}
+header.top h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+header.top .sub{color:var(--ink-soft);font-size:14px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+button{font:600 14px/1 "Source Sans 3",system-ui,sans-serif;cursor:pointer;border-radius:6px;padding:10px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button:hover{border-color:var(--kraft)}
+button.primary{background:var(--kraft);border-color:var(--kraft);color:#fff}
+button.primary:hover{filter:brightness(1.07)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--kraft);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;margin-top:24px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;box-shadow:var(--shadow);margin-bottom:20px}
+section.panel > h2{font-size:12px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--kraft);margin-bottom:14px}
+.fields{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f.c6{grid-column:span 6}.f.c4{grid-column:span 4}.f.c3{grid-column:span 3}.f.c2{grid-column:span 2}
+@media (max-width:640px){.f.c4,.f.c3{grid-column:span 6}.f.c2{grid-column:span 3}}
+label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft)}
+input,select,textarea{font:400 15px/1.35 "Source Sans 3",system-ui,sans-serif;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:9px 10px;width:100%}
+input.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:14px}
+.hint{font-size:12px;color:var(--ink-soft)}
+.checkline{display:flex;align-items:center;gap:8px;font-size:14px}
+.checkline input{width:auto;accent-color:var(--kraft)}
+.checkline label{text-transform:none;letter-spacing:0;font-size:14px;font-weight:400;color:var(--ink)}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.stack{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px)}
+/* ---- 4x6 label ---- */
+.labelwrap{display:flex;flex-direction:column;gap:10px}
+.label{width:100%;max-width:360px;aspect-ratio:4/6;background:var(--label-ground);color:var(--label-ink);border:1px solid var(--line);border-radius:3px;padding:14px;display:flex;flex-direction:column;gap:8px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:10px;line-height:1.35;overflow:hidden}
+.label .lrow{display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px solid #000;padding-bottom:6px}
+.label .brand{font-family:Archivo,sans-serif;font-weight:700;font-size:13px;letter-spacing:.02em}
+.label .blk{border-bottom:1px solid #000;padding-bottom:7px}
+.label .tag{font-size:8px;letter-spacing:.14em;font-weight:700}
+.label .to{font-size:14px;line-height:1.3;font-weight:700;word-break:break-word}
+.label .parcel{display:flex;gap:14px;flex-wrap:wrap}
+.label .parcel b{display:block;font-size:8px;letter-spacing:.12em;font-weight:700}
+.label .fragile{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap}
+.label .stamp{border:2px solid #000;padding:3px 7px;font-weight:700;font-size:9px;letter-spacing:.14em}
+.label .code{display:flex;flex-direction:column;align-items:center;gap:3px}
+.label .code svg{width:100%;height:52px}
+.label .code span{letter-spacing:.22em;font-size:10px;font-weight:700}
+.saved{display:flex;flex-direction:column;gap:8px}
+.ship{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--field)}
+.ship .who{font-weight:600;font-size:14px}
+.ship .meta{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-soft)}
+.ship .acts{display:flex;gap:6px}
+.ship button{padding:6px 9px;font-size:12px}
+pre.json{margin:0;background:var(--field);border:1px solid var(--line);border-radius:7px;padding:12px;overflow:auto;max-height:280px;font-family:"JetBrains Mono",monospace;font-size:11.5px;line-height:1.5;color:var(--ink)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom, 0px) + 20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:50;box-shadow:var(--shadow)}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);padding:0;max-width:min(560px,92vw);width:100%}
+dialog::backdrop{background:rgba(10,12,18,.5)}
+dialog .dlg{padding:20px}
+dialog h2{font-size:18px;margin-bottom:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  @page{size:4in 6in;margin:0}
+  body{background:#fff}
+  .wrap > *:not(.printhost), header.top, .noprint{display:none!important}
+  .printhost{display:block!important;padding:0;margin:0;max-width:none}
+  .label{max-width:none;width:4in;height:6in;aspect-ratio:auto;border:none;border-radius:0;page-break-after:avoid;background:#fff;color:#000}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Freightcom Label Desk</h1>
+      <div class="sub">Address in, 4&times;6 label out &mdash; with a Freightcom-ready shipment payload.</div>
+    </div>
+    <div class="tools">
+      <button id="btn-settings">Ship-from &amp; defaults</button>
+      <button id="btn-reset">New shipment</button>
+      <button class="primary" id="btn-print">Print label</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div>
+      <section class="panel">
+        <h2>Ship to</h2>
+        <div class="fields">
+          <div class="f c3"><label for="t_name">Recipient</label><input id="t_name" placeholder="Jane Whitlock"></div>
+          <div class="f c3"><label for="t_company">Company (optional)</label><input id="t_company" placeholder=""></div>
+          <div class="f c4"><label for="t_addr1">Street address</label><input id="t_addr1" placeholder="88 Wellington St W"></div>
+          <div class="f c2"><label for="t_addr2">Unit / suite</label><input id="t_addr2" placeholder="Apt 4"></div>
+          <div class="f c2"><label for="t_city">City</label><input id="t_city" placeholder="Toronto"></div>
+          <div class="f c2"><label for="t_region">Province / state</label><input id="t_region" class="mono" placeholder="ON"></div>
+          <div class="f c2"><label for="t_postal">Postal / ZIP</label><input id="t_postal" class="mono" placeholder="M5J 2R7"></div>
+          <div class="f c2"><label for="t_country">Country</label>
+            <select id="t_country"><option value="CA">Canada</option><option value="US">United States</option></select></div>
+          <div class="f c2"><label for="t_phone">Phone</label><input id="t_phone" class="mono" placeholder="4165550142"></div>
+          <div class="f c2"><label for="t_email">Email (optional)</label><input id="t_email" type="email" placeholder=""></div>
+          <div class="f c6"><div class="checkline"><input type="checkbox" id="t_residential" checked><label for="t_residential">Residential address</label></div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Parcel</h2>
+        <div class="fields">
+          <div class="f c2"><label for="p_l">Length (in)</label><input id="p_l" class="mono" type="number" step="0.1" min="0.1"></div>
+          <div class="f c2"><label for="p_w">Width (in)</label><input id="p_w" class="mono" type="number" step="0.1" min="0.1"></div>
+          <div class="f c2"><label for="p_h">Height (in)</label><input id="p_h" class="mono" type="number" step="0.1" min="0.1"></div>
+          <div class="f c2"><label for="p_weight">Weight (lb)</label><input id="p_weight" class="mono" type="number" step="0.01" min="0.01"></div>
+          <div class="f c2"><label for="p_value">Declared value (CAD)</label><input id="p_value" class="mono" type="number" step="0.01" min="0"></div>
+          <div class="f c2"><label for="p_qty">Boxes</label><input id="p_qty" class="mono" type="number" step="1" min="1" value="1"></div>
+          <div class="f c4"><label for="p_desc">Contents</label><input id="p_desc"></div>
+          <div class="f c2"><label for="p_ref">Reference</label><input id="p_ref" class="mono"></div>
+          <div class="f c3"><div class="checkline"><input type="checkbox" id="p_fragile" checked><label for="p_fragile">Mark FRAGILE / THIS SIDE UP</label></div></div>
+          <div class="f c3"><div class="checkline"><input type="checkbox" id="p_insure"><label for="p_insure">Request Freightcom insurance</label></div></div>
+          <div class="f c6"><div class="hint">Leave a field blank and it falls back to your saved default. Declared value is what goes on the customs line; insurance is a separate paid add-on and stays off unless you tick it.</div></div>
+        </div>
+        <div class="rowbtns">
+          <button class="primary" id="btn-save">Save shipment</button>
+          <button id="btn-copy">Copy Freightcom JSON</button>
+          <button id="btn-download">Download JSON</button>
+          <button id="btn-togglejson">Show payload</button>
+        </div>
+      </section>
+
+      <section class="panel" id="jsonpanel" hidden>
+        <h2>Freightcom shipment payload</h2>
+        <pre class="json" id="jsonout"></pre>
+        <div class="hint" style="margin-top:10px">Built to the Freightcom Customer API <code>POST /rate</code> shape. <code>service_id</code> and <code>payment_method_id</code> come from your own account, so they are left blank here &mdash; fill them before booking. Check field names against developer.freightcom.com for your API version.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Recent shipments</h2>
+        <div class="saved" id="savedlist"></div>
+      </section>
+    </div>
+
+    <div>
+      <div class="stack">
+        <section class="panel">
+          <h2>Label preview &mdash; 4&times;6</h2>
+          <div class="labelwrap">
+            <div class="label" id="label"></div>
+            <div class="hint">This is your own packing/address label. It is not a carrier-scannable label &mdash; the barcode encodes your reference number. A carrier label comes back from Freightcom once a shipment is booked with a service and payment method.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="printhost" id="printhost" style="display:none"></div>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" class="dlg">
+    <h2>Ship-from &amp; defaults</h2>
+    <div class="fields">
+      <div class="f c3"><label for="s_name">Your name</label><input id="s_name"></div>
+      <div class="f c3"><label for="s_company">Business name</label><input id="s_company"></div>
+      <div class="f c4"><label for="s_addr1">Street address</label><input id="s_addr1"></div>
+      <div class="f c2"><label for="s_addr2">Unit</label><input id="s_addr2"></div>
+      <div class="f c2"><label for="s_city">City</label><input id="s_city"></div>
+      <div class="f c2"><label for="s_region">Province</label><input id="s_region" class="mono"></div>
+      <div class="f c2"><label for="s_postal">Postal code</label><input id="s_postal" class="mono"></div>
+      <div class="f c3"><label for="s_country">Country</label>
+        <select id="s_country"><option value="CA">Canada</option><option value="US">United States</option></select></div>
+      <div class="f c3"><label for="s_phone">Phone</label><input id="s_phone" class="mono"></div>
+      <div class="f c6"><label>Default parcel</label></div>
+      <div class="f c2"><label for="d_l">Length (in)</label><input id="d_l" class="mono" type="number" step="0.1"></div>
+      <div class="f c2"><label for="d_w">Width (in)</label><input id="d_w" class="mono" type="number" step="0.1"></div>
+      <div class="f c2"><label for="d_h">Height (in)</label><input id="d_h" class="mono" type="number" step="0.1"></div>
+      <div class="f c2"><label for="d_weight">Weight (lb)</label><input id="d_weight" class="mono" type="number" step="0.01"></div>
+      <div class="f c2"><label for="d_value">Value (CAD)</label><input id="d_value" class="mono" type="number" step="0.01"></div>
+      <div class="f c2"><label for="d_desc">Contents</label><input id="d_desc"></div>
+      <div class="f c6"><label for="s_key">Freightcom API key (optional)</label><input id="s_key" class="mono" type="password" placeholder="leave blank if you don't have one">
+        <div class="hint">Freightcom issues API keys from your account &mdash; ask their support to enable API access. Stored only in this browser; the app never sends it anywhere.</div></div>
+    </div>
+    <div class="rowbtns"><button class="primary" id="s_save" value="save">Save defaults</button><button value="cancel">Cancel</button></div>
+  </form>
+</dialog>
+
+<script>
+"use strict";
+var PATT="2122222221222222211212231213221312221222131223121322122212132213122312121122321221321222311132221231221232212232112211322212312132122231123121313112223211223212213122123221123222112121232123212321211113231311231313211123131321131323112113132311132313111121331123311321311131231133211331213131212113312311312131132133112131313111233113213311213121133123113321113141112214114311111112241114221211241214211411221412211122141124121221141224111421121422112412112211144131112411121341111112421211421212411142121241121242114112124211124212112121412141214121211111431113411311411141131143114111134113111131411141313111414111312114122112142112322331112";
+function code128(text){
+  var vals=[104],i,c;
+  for(i=0;i<text.length;i++){c=text.charCodeAt(i);if(c<32||c>126)c=32;vals.push(c-32);}
+  var sum=104;for(i=1;i<vals.length;i++)sum+=i*vals[i];
+  vals.push(sum%103);vals.push(106);
+  var bars=[],x=0,dark=true;
+  for(i=0;i<vals.length;i++){
+    var p=PATT.substr(vals[i]*6,vals[i]===106?7:6);
+    dark=true;
+    for(var j=0;j<p.length;j++){var wdt=parseInt(p[j],10);if(dark)bars.push([x,wdt]);x+=wdt;dark=!dark;}
+  }
+  var svg='<svg viewBox="0 0 '+x+' 30" preserveAspectRatio="none" role="img" aria-label="Reference '+esc(text)+'">';
+  for(i=0;i<bars.length;i++)svg+='<rect x="'+bars[i][0]+'" y="0" width="'+bars[i][1]+'" height="30" fill="#000"/>';
+  return svg+"</svg>";
+}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function $(id){return document.getElementById(id);}
+
+var DEFAULTS={
+  sender:{name:"",company:"",addr1:"",addr2:"",city:"",region:"",postal:"",country:"CA",phone:""},
+  parcel:{l:4,w:4,h:4,weight:0.55,value:5,desc:"Glass figurine"},
+  apiKey:""
+};
+var settings=JSON.parse(JSON.stringify(DEFAULTS));
+var shipments=[];
+var db=null,downloads=null;
+
+/* ---------- persistence: db when the page runs on claude.ai, localStorage otherwise ---------- */
+var LS_S="fcld.settings",LS_H="fcld.shipments";
+function lsGet(k,fb){try{var v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+function saveSettings(){
+  lsSet(LS_S,settings);
+  if(db)db.doc("config/settings").set({data:JSON.stringify(settings)}).catch(function(){});
+}
+function persistShipments(){
+  lsSet(LS_H,shipments);
+  if(db)db.doc("config/shipments").set({data:JSON.stringify(shipments.slice(0,60))}).catch(function(){});
+}
+async function boot(){
+  settings=Object.assign({},DEFAULTS,lsGet(LS_S,DEFAULTS));
+  settings.sender=Object.assign({},DEFAULTS.sender,settings.sender);
+  settings.parcel=Object.assign({},DEFAULTS.parcel,settings.parcel);
+  shipments=lsGet(LS_H,[]);
+  fillDefaults();render();renderSaved();
+  try{db=await window.claude.use("db");}catch(e){db=null;}
+  try{downloads=await window.claude.use("downloads");}catch(e){downloads=null;}
+  if(!downloads)$("btn-download").hidden=true;
+  if(db){
+    try{
+      var s=await db.doc("config/settings").get();
+      if(s.exists&&s.data().data){settings=JSON.parse(s.data().data);fillDefaults();}
+      var h=await db.doc("config/shipments").get();
+      if(h.exists&&h.data().data){shipments=JSON.parse(h.data().data);renderSaved();}
+      render();
+    }catch(e){}
+  }
+}
+
+/* ---------- form state ---------- */
+function num(v,fb){var n=parseFloat(v);return isFinite(n)&&n>0?n:fb;}
+function state(){
+  var p=settings.parcel;
+  return {
+    to:{name:$("t_name").value.trim(),company:$("t_company").value.trim(),addr1:$("t_addr1").value.trim(),
+        addr2:$("t_addr2").value.trim(),city:$("t_city").value.trim(),region:$("t_region").value.trim().toUpperCase(),
+        postal:$("t_postal").value.trim().toUpperCase(),country:$("t_country").value,
+        phone:$("t_phone").value.trim(),email:$("t_email").value.trim(),residential:$("t_residential").checked},
+    parcel:{l:num($("p_l").value,p.l),w:num($("p_w").value,p.w),h:num($("p_h").value,p.h),
+            weight:num($("p_weight").value,p.weight),value:num($("p_value").value,p.value),
+            qty:Math.max(1,parseInt($("p_qty").value,10)||1),
+            desc:$("p_desc").value.trim()||p.desc,ref:$("p_ref").value.trim()||newRef(),
+            fragile:$("p_fragile").checked,insure:$("p_insure").checked}
+  };
+}
+function newRef(){
+  var d=new Date(),p=function(n){return String(n).padStart(2,"0");};
+  return "GF-"+String(d.getFullYear()).slice(2)+p(d.getMonth()+1)+p(d.getDate())+"-"+
+    Math.random().toString(36).slice(2,6).toUpperCase();
+}
+function fillDefaults(){
+  var s=settings.sender,p=settings.parcel;
+  $("s_name").value=s.name;$("s_company").value=s.company;$("s_addr1").value=s.addr1;$("s_addr2").value=s.addr2;
+  $("s_city").value=s.city;$("s_region").value=s.region;$("s_postal").value=s.postal;$("s_country").value=s.country||"CA";
+  $("s_phone").value=s.phone;$("s_key").value=settings.apiKey||"";
+  $("d_l").value=p.l;$("d_w").value=p.w;$("d_h").value=p.h;$("d_weight").value=p.weight;$("d_value").value=p.value;$("d_desc").value=p.desc;
+  $("p_l").placeholder=p.l;$("p_w").placeholder=p.w;$("p_h").placeholder=p.h;
+  $("p_weight").placeholder=p.weight;$("p_value").placeholder=p.value;$("p_desc").placeholder=p.desc;
+}
+
+/* ---------- label ---------- */
+function addrLines(a){
+  var out=[];
+  if(a.company)out.push(a.company);
+  if(a.addr1)out.push(a.addr1+(a.addr2?", "+a.addr2:""));
+  var l3=[a.city,a.region].filter(Boolean).join(", ");
+  if(a.postal)l3=l3?l3+"  "+a.postal:a.postal;
+  if(l3)out.push(l3);
+  if(a.country)out.push(a.country==="CA"?"CANADA":a.country==="US"?"UNITED STATES":a.country);
+  return out;
+}
+function labelHTML(st){
+  var s=settings.sender,p=st.parcel,t=st.to;
+  var from=[s.company||s.name,s.addr1+(s.addr2?", "+s.addr2:""),[s.city,s.region].filter(Boolean).join(", ")+(s.postal?"  "+s.postal:""),s.phone]
+    .filter(function(x){return x&&x.trim()&&x.trim()!==",";});
+  var stamps="";
+  if(p.fragile)stamps='<div class="stamp">FRAGILE</div><div class="stamp">THIS SIDE UP</div>';
+  if(p.insure)stamps+='<div class="stamp">INSURED</div>';
+  return ''+
+  '<div class="lrow"><div class="brand">'+esc(s.company||s.name||"SHIPMENT")+'</div><div>'+esc(new Date().toISOString().slice(0,10))+'</div></div>'+
+  '<div class="blk"><div class="tag">FROM</div>'+(from.length?from.map(function(l){return esc(l);}).join("<br>"):"&mdash; set your ship-from address &mdash;")+'</div>'+
+  '<div class="blk"><div class="tag">SHIP TO</div><div class="to">'+esc(t.name||"Recipient name")+'</div>'+
+    addrLines(t).map(function(l){return esc(l);}).join("<br>")+
+    (t.phone?'<br>TEL '+esc(t.phone):"")+
+    (t.residential?'<br>RESIDENTIAL':"")+'</div>'+
+  '<div class="blk parcel">'+
+    '<div><b>DIMS (IN)</b>'+p.l+' &times; '+p.w+' &times; '+p.h+'</div>'+
+    '<div><b>WEIGHT</b>'+p.weight+' lb</div>'+
+    '<div><b>VALUE</b>$'+p.value.toFixed(2)+' CAD</div>'+
+    '<div><b>BOXES</b>'+p.qty+'</div>'+
+  '</div>'+
+  '<div class="blk"><div class="tag">CONTENTS</div>'+esc(p.desc)+'</div>'+
+  '<div class="fragile">'+stamps+'</div>'+
+  '<div class="code">'+code128(p.ref)+'<span>'+esc(p.ref)+'</span></div>';
+}
+
+/* ---------- Freightcom payload ---------- */
+function fcAddress(a){
+  return {address_line_1:a.addr1||"",address_line_2:a.addr2||"",unit_number:"",
+    city:a.city||"",region:a.region||"",country:a.country||"CA",postal_code:(a.postal||"").replace(/\s+/g,"")};
+}
+function payload(st){
+  var s=settings.sender,p=st.parcel,t=st.to,d=new Date();
+  var pkg={measurements:{weight:{unit:"lb",value:p.weight},cuboid:{unit:"in",l:p.l,w:p.w,h:p.h}},description:p.desc};
+  var packages=[];for(var i=0;i<p.qty;i++)packages.push(pkg);
+  var body={
+    unique_id:p.ref,
+    service_id:"",
+    payment_method_id:"",
+    details:{
+      origin:{name:s.name||"",company_name:s.company||"",address:fcAddress(s),residential:false,
+        contact_name:s.name||"",phone_number:{number:(s.phone||"").replace(/\D/g,""),extension:""},email_addresses:[]},
+      destination:{name:t.name||"",company_name:t.company||"",address:fcAddress(t),residential:!!t.residential,
+        contact_name:t.name||"",phone_number:{number:(t.phone||"").replace(/\D/g,""),extension:""},
+        email_addresses:t.email?[t.email]:[]},
+      expected_ship_date:{year:d.getFullYear(),month:d.getMonth()+1,day:d.getDate()},
+      packaging_type:"package",
+      packaging_properties:{packages:packages},
+      reference_codes:[p.ref]
+    }
+  };
+  if(p.insure)body.details.insurance={type:"internal",total_cost:{currency:"CAD",value:p.value.toFixed(2)}};
+  if(t.country!==(s.country||"CA")){
+    body.details.customs_invoice={reason_for_export:"sale",duty_currency:"CAD",
+      items:[{description:p.desc,quantity:p.qty,unit_value:{currency:"CAD",value:p.value.toFixed(2)},country_of_origin:s.country||"CA"}]};
+  }
+  return body;
+}
+
+/* ---------- render ---------- */
+function render(){
+  var st=state();
+  $("label").innerHTML=labelHTML(st);
+  if(!$("jsonpanel").hidden)$("jsonout").textContent=JSON.stringify(payload(st),null,2);
+}
+function renderSaved(){
+  var host=$("savedlist");
+  if(!shipments.length){host.innerHTML='<div class="hint">Nothing saved yet. Fill in a ship-to address and hit Save shipment &mdash; it lands here so you can reprint or reuse it.</div>';return;}
+  host.innerHTML="";
+  shipments.forEach(function(sh,i){
+    var row=document.createElement("div");row.className="ship";
+    row.innerHTML='<div><div class="who">'+esc(sh.to.name||"(no name)")+'</div>'+
+      '<div class="meta">'+esc(sh.parcel.ref)+' &middot; '+esc([sh.to.city,sh.to.region].filter(Boolean).join(", "))+
+      ' &middot; '+sh.parcel.weight+' lb &middot; $'+sh.parcel.value.toFixed(2)+'</div></div>'+
+      '<div class="acts"><button data-a="load" data-i="'+i+'">Load</button><button data-a="del" data-i="'+i+'">Delete</button></div>';
+    host.appendChild(row);
+  });
+}
+function loadShipment(sh){
+  var t=sh.to,p=sh.parcel;
+  $("t_name").value=t.name;$("t_company").value=t.company;$("t_addr1").value=t.addr1;$("t_addr2").value=t.addr2;
+  $("t_city").value=t.city;$("t_region").value=t.region;$("t_postal").value=t.postal;$("t_country").value=t.country;
+  $("t_phone").value=t.phone;$("t_email").value=t.email;$("t_residential").checked=!!t.residential;
+  $("p_l").value=p.l;$("p_w").value=p.w;$("p_h").value=p.h;$("p_weight").value=p.weight;$("p_value").value=p.value;
+  $("p_qty").value=p.qty;$("p_desc").value=p.desc;$("p_ref").value=p.ref;
+  $("p_fragile").checked=!!p.fragile;$("p_insure").checked=!!p.insure;
+  render();
+}
+var toastTimer;
+function toast(msg){
+  var el=document.querySelector(".toast");if(el)el.remove();
+  el=document.createElement("div");el.className="toast noprint";el.textContent=msg;document.body.appendChild(el);
+  clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.remove();},2200);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("input",function(e){
+  if(e.target.closest("dialog"))return;
+  render();
+});
+$("btn-togglejson").addEventListener("click",function(){
+  var p=$("jsonpanel");p.hidden=!p.hidden;
+  this.textContent=p.hidden?"Show payload":"Hide payload";render();
+});
+$("btn-copy").addEventListener("click",async function(){
+  var txt=JSON.stringify(payload(state()),null,2);
+  try{await navigator.clipboard.writeText(txt);toast("Payload copied");}
+  catch(e){$("jsonpanel").hidden=false;$("btn-togglejson").textContent="Hide payload";render();toast("Clipboard blocked — payload shown below");}
+});
+$("btn-download").addEventListener("click",async function(){
+  if(!downloads){toast("Downloads not available here");return;}
+  var st=state();
+  try{
+    await downloads.save({filename:st.parcel.ref+".json",data:JSON.stringify(payload(st),null,2)});
+    toast("Saved");
+  }catch(e){toast("Download declined");}
+});
+$("btn-save").addEventListener("click",function(){
+  var st=state();
+  if(!st.to.name||!st.to.addr1){toast("Add a recipient name and street address first");return;}
+  $("p_ref").value=st.parcel.ref;
+  shipments.unshift({to:st.to,parcel:st.parcel,at:Date.now()});
+  shipments=shipments.slice(0,60);
+  persistShipments();renderSaved();toast("Shipment saved");
+});
+$("savedlist").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  var i=parseInt(b.dataset.i,10);
+  if(b.dataset.a==="load"){loadShipment(shipments[i]);toast("Loaded");}
+  else{shipments.splice(i,1);persistShipments();renderSaved();}
+});
+$("btn-reset").addEventListener("click",function(){
+  ["t_name","t_company","t_addr1","t_addr2","t_city","t_region","t_postal","t_phone","t_email",
+   "p_l","p_w","p_h","p_weight","p_value","p_desc","p_ref"].forEach(function(id){$(id).value="";});
+  $("p_qty").value=1;$("t_residential").checked=true;$("p_fragile").checked=true;$("p_insure").checked=false;
+  render();
+});
+$("btn-print").addEventListener("click",function(){
+  $("printhost").innerHTML='<div class="label">'+labelHTML(state())+'</div>';
+  window.print();
+});
+$("btn-settings").addEventListener("click",function(){$("dlg").showModal();});
+$("dlg").addEventListener("close",function(){
+  if($("dlg").returnValue!=="save"){fillDefaults();return;}
+  settings.sender={name:$("s_name").value.trim(),company:$("s_company").value.trim(),addr1:$("s_addr1").value.trim(),
+    addr2:$("s_addr2").value.trim(),city:$("s_city").value.trim(),region:$("s_region").value.trim().toUpperCase(),
+    postal:$("s_postal").value.trim().toUpperCase(),country:$("s_country").value,phone:$("s_phone").value.trim()};
+  settings.parcel={l:num($("d_l").value,4),w:num($("d_w").value,4),h:num($("d_h").value,4),
+    weight:num($("d_weight").value,0.55),value:num($("d_value").value,5),desc:$("d_desc").value.trim()||"Glass figurine"};
+  settings.apiKey=$("s_key").value;
+  saveSettings();fillDefaults();render();toast("Defaults saved");
+});
+boot();
+</script>
