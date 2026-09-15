@@ -1,0 +1,9 @@
+# Local config — contains your address, phone, email and any credentials
+scripts/config.local.json
+
+# Saved browser session from the shipping script
+scripts/.auth/
+
+node_modules/
+npm-debug.log*
+.DS_Store
